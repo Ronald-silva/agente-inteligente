@@ -30,7 +30,7 @@ app.use((err, req, res, next) => {
 // Inicialização
 const port = process.env.PORT || 3000;
 
-const server = app.listen(port, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log('✅ Servidor iniciado na porta:', port);
 });
 
