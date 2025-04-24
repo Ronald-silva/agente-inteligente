@@ -1,9 +1,3 @@
-const webhook = (req, res) => {
-  console.log('📥 Webhook recebeu:', req.body); // <- Adicione isso
-  res.sendStatus(200);
-};
-
-
 const askOpenAI = require('../services/openai');
 const sendMessage = require('../services/zapi');
 
@@ -13,9 +7,7 @@ const formatPhone = (number) => {
   return `(${ddd}) ${base.slice(0, 5)}-${base.slice(5)}`;
 };
 
-
-
-module.exports = async (req, res) => {
+const webhook = async (req, res) => {
   try {
     const { phone, message } = req.body;
 
@@ -41,3 +33,5 @@ module.exports = async (req, res) => {
     res.status(500).json({ error: 'Erro interno no servidor' });
   }
 };
+
+module.exports = webhook;
