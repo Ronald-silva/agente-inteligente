@@ -9,6 +9,8 @@ const formatPhone = (number) => {
 
 const webhook = async (req, res) => {
   try {
+    console.log('📥 Webhook recebeu:', req.body);
+
     const { phone, message } = req.body;
 
     if (!phone || !message) {
@@ -21,11 +23,9 @@ const webhook = async (req, res) => {
     console.log(`📥 [${now}] Mensagem recebida de ${formattedPhone}: "${message}"`);
 
     const resposta = await askOpenAI(message);
-
     await sendMessage(phone, resposta);
 
     console.log(`📤 Resposta enviada: "${resposta}"`);
-
     res.status(200).json({ success: true });
 
   } catch (error) {

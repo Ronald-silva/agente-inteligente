@@ -1,3 +1,6 @@
+
+require('dotenv').config();
+
 // OpenAI API logic will be here
 const axios = require('axios');
 
