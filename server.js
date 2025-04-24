@@ -28,10 +28,13 @@ app.use((err, req, res, next) => {
 });
 
 // Inicialização
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log('✅ Servidor iniciado na porta:', port);
+  console.log('✅ Servidor iniciado na porta:', PORT);
+  console.log('📝 Variáveis de ambiente:');
+  console.log('- PORT:', PORT);
+  console.log('- NODE_ENV:', process.env.NODE_ENV || 'development');
 });
 
 // Graceful shutdown
