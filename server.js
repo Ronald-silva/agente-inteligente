@@ -1,21 +1,17 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const path = require('path');
-const webhook = require('./controllers/webhook');
+// server.js
+import express from 'express';
+import dotenv from 'dotenv';
+import path from 'path';
+import webhook from './controllers/webhook.js';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// Rota para verificar se está online
+// Serve o dashboard estático em /
 app.get('/', (req, res) => {
-  res.send('🤖 Carla - LuceBot está online!');
-});
-
-// Rota do dashboard
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboard.html'));
+  res.sendFile(path.join(path.resolve(), 'dashboard.html'));
 });
 
 // Rota do webhook
@@ -25,5 +21,5 @@ const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
-  console.log(`✅ Servidor rodando na porta ${PORT}`);
+  console.log(`✅ Servidor rodando em http://${HOST}:${PORT}`);
 });
