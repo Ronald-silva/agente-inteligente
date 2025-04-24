@@ -56,7 +56,8 @@ app.get('/status', (req, res) => {
       env: process.env.NODE_ENV,
       uptime: Math.floor(uptime),
       memory: process.memoryUsage(),
-      pid: process.pid
+      pid: process.pid,
+      pm2_managed: typeof process.send === 'function'
     });
   } catch (error) {
     console.error('❌ Erro na rota de status:', error);
@@ -107,6 +108,11 @@ if (missingEnvVars.length > 0) {
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
+  
+  // Notifica o PM2 que o servidor está pronto
+  if (typeof process.send === 'function') {
+    process.send('ready');
+  }
 });
 
 // Configuração de timeout do servidor
