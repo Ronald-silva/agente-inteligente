@@ -8,11 +8,16 @@ dotenv.config();
 
 const app = express();
 
-// para servir arquivos estáticos (dashboard.html, css, js, etc)
-app.use(express.static(path.join(__dirname, 'public')));
+// Middleware para arquivos estáticos
+app.use(express.static('public'));
 app.use(express.json());
 
-// rota raiz: serve o dashboard
+// Health check para o Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+// Rota raiz: serve o dashboard
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
@@ -22,6 +27,7 @@ app.post('/webhook', webhook);
 
 const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0';
+
 app.listen(PORT, HOST, () => {
   console.log(`✅ Servidor rodando em http://${HOST}:${PORT}`);
 });
