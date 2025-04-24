@@ -3,19 +3,42 @@ const express = require('express');
 const dotenv = require('dotenv');
 const webhook = require('./controllers/webhook');
 
+// Carrega variáveis de ambiente
 dotenv.config();
+
+// Inicializa o Express
 const app = express();
 
-// Configurações básicas
+// Middleware
 app.use(express.json());
 app.use(express.static('public'));
 
-// Rotas
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
+// Health check
+app.get('/health', (_, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Webhook
 app.post('/webhook', webhook);
+
+// Error handling
+app.use((err, req, res, next) => {
+  console.error('❌ Erro:', err);
+  res.status(500).json({ error: 'Erro interno no servidor' });
+});
 
 // Inicialização
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log('✅ Servidor rodando na porta:', port);
+
+const server = app.listen(port, () => {
+  console.log('✅ Servidor iniciado na porta:', port);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 Recebido sinal SIGTERM');
+  server.close(() => {
+    console.log('✅ Servidor encerrado');
+    process.exit(0);
+  });
 });
