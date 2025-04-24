@@ -1,6 +1,12 @@
 const askOpenAI = require('../services/openai');
 const sendMessage = require('../services/zapi');
 
+const formatPhone = (number) => {
+  const ddd = number.slice(2, 4);
+  const base = number.slice(4);
+  return `(${ddd}) ${base.slice(0, 5)}-${base.slice(5)}`;
+};
+
 module.exports = async (req, res) => {
   try {
     const { phone, message } = req.body;
@@ -9,18 +15,21 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Dados incompletos' });
     }
 
-    console.log(`📩 Mensagem recebida de ${phone}: ${message}`);
+    const now = new Date().toLocaleString('pt-BR', { timeZone: 'America/Fortaleza' });
+    const formattedPhone = formatPhone(phone);
 
-    // Gera resposta com a Carla (OpenAI)
+    console.log(`📥 [${now}] Mensagem recebida de ${formattedPhone}: "${message}"`);
+
     const resposta = await askOpenAI(message);
 
-    // Envia a resposta pro usuário via Z-API
     await sendMessage(phone, resposta);
+
+    console.log(`📤 Resposta enviada: "${resposta}"`);
 
     res.status(200).json({ success: true });
 
   } catch (error) {
-    console.error('❌ Erro no webhook:', error);
+    console.error('❌ Erro no webhook:', error.message);
     res.status(500).json({ error: 'Erro interno no servidor' });
   }
 };
