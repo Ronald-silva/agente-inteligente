@@ -6,6 +6,11 @@ const processMessage = require('./services/messageProcessor');
 
 console.log('✅ Módulos carregados');
 
+// Keep-alive ping
+setInterval(() => {
+  console.log('💓 Keep-alive ping');
+}, 30000);
+
 // Processo para manter o servidor rodando
 process.on('uncaughtException', (error) => {
   console.error('❌ Erro não tratado:', error);
@@ -44,10 +49,14 @@ app.use((req, res, next) => {
 app.get('/status', (req, res) => {
   try {
     console.log('📝 Requisição de status recebida');
+    const uptime = process.uptime();
     res.status(200).json({ 
       status: 'ok',
       timestamp: new Date().toISOString(),
-      env: process.env.NODE_ENV
+      env: process.env.NODE_ENV,
+      uptime: Math.floor(uptime),
+      memory: process.memoryUsage(),
+      pid: process.pid
     });
   } catch (error) {
     console.error('❌ Erro na rota de status:', error);
@@ -74,6 +83,11 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Rota de fallback para 404
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada' });
+});
+
 // Tratamento de erros
 app.use((err, req, res, next) => {
   console.error('❌ Erro na aplicação:', err);
@@ -91,9 +105,13 @@ if (missingEnvVars.length > 0) {
 
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
 });
+
+// Configuração de timeout do servidor
+server.keepAliveTimeout = 120000; // 2 minutos
+server.headersTimeout = 120000; // 2 minutos
 
 // Tratamento de erros do servidor HTTP
 server.on('error', (error) => {
