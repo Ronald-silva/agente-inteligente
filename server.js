@@ -2,13 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const webhook = require('./controllers/webhook');
 
-
-
 dotenv.config();
-
-console.log('✅ OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
-console.log('✅ ZAPI_INSTANCE_ID:', process.env.ZAPI_INSTANCE_ID);
-console.log('✅ ZAPI_TOKEN:', process.env.ZAPI_TOKEN);
 
 const app = express();
 app.use(express.json());

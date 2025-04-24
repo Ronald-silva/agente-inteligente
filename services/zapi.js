@@ -6,10 +6,7 @@ const sendMessage = async (phone, message) => {
 
   const url = `https://api.z-api.io/instances/${instanceId}/send-messages`;
 
-  console.log("🔎 URL gerada:", url);
-  console.log("🔐 ZAPI_INSTANCE_ID:", instanceId);
-  console.log("🔐 ZAPI_TOKEN:", token);
-
+  
   try {
     const response = await axios.post(
       url,
