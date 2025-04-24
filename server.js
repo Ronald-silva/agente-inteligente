@@ -14,6 +14,8 @@ app.get('/', (req, res) => {
 app.post('/webhook', webhook);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const HOST = '0.0.0.0'; // <- ESSENCIAL
+
+app.listen(PORT, HOST, () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
 });
