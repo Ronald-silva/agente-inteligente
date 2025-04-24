@@ -1,3 +1,9 @@
+const webhook = (req, res) => {
+  console.log('📥 Webhook recebeu:', req.body); // <- Adicione isso
+  res.sendStatus(200);
+};
+
+
 const askOpenAI = require('../services/openai');
 const sendMessage = require('../services/zapi');
 
@@ -6,6 +12,8 @@ const formatPhone = (number) => {
   const base = number.slice(4);
   return `(${ddd}) ${base.slice(0, 5)}-${base.slice(5)}`;
 };
+
+
 
 module.exports = async (req, res) => {
   try {
