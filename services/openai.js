@@ -1,22 +1,7 @@
-
 require('dotenv').config();
-
-// OpenAI API logic will be here
 const axios = require('axios');
 
-const askOpenAI = async (userMessage) => {
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  try {
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: `
-Você é Carla, assistente virtual do Colégio Lucê.
+const SYSTEM_PROMPT = `Você é Carla, assistente virtual do Colégio Lucê.
 Seu papel é tirar dúvidas dos pais com educação, clareza e empatia.
 Use linguagem acolhedora, objetiva e profissional.
 
@@ -31,31 +16,46 @@ Sempre que possível, oriente os pais com base nestes pontos:
 
 Se você não souber a resposta, diga: "Esse assunto será encaminhado à secretaria."
 
-Não diga que é uma IA. Não se desculpe. Finalize com simpatia e ajuda extra.
-            `
+Não diga que é uma IA. Não se desculpe. Finalize com simpatia e ajuda extra.`;
+
+module.exports = async function askOpenAI(userMessage) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    console.error('❌ OPENAI_API_KEY não configurada');
+    throw new Error('API key não configurada');
+  }
+
+  try {
+    const resp = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { 
+            role: 'system', 
+            content: SYSTEM_PROMPT 
           },
-          {
-            role: 'user',
-            content: userMessage
+          { 
+            role: 'user', 
+            content: userMessage 
           }
         ],
         temperature: 0.5,
         max_tokens: 500
       },
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
+      { 
+        headers: { 
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
-        }
+        } 
       }
     );
 
-    return response.data.choices[0].message.content;
-
+    return resp.data.choices[0].message.content;
+    
   } catch (error) {
-    console.error('❌ Erro na resposta do OpenAI:', error.response?.data || error.message);
-    return "Desculpe, houve um erro ao processar sua mensagem.";
+    console.error('❌ Erro ao chamar OpenAI:', error.response?.data || error.message);
+    throw error;
   }
-};
-
-module.exports = askOpenAI;
+}

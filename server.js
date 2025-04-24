@@ -1,31 +1,27 @@
 // server.js
-const express = require('express');
-const dotenv = require('dotenv');
-const path = require('path');
-const webhook = require('./controllers/webhook');
+const express  = require('express');
+const dotenv   = require('dotenv');
+const path     = require('path');
+const webhook  = require('./controllers/webhook');
 
 dotenv.config();
 
 const app = express();
+
+// para servir arquivos estáticos (dashboard.html, css, js, etc)
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Health check para o Railway
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-
-// Servir dashboard.html na raiz
+// rota raiz: serve o dashboard
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboard.html'));
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
-// Rota do webhook
+// rota de webhook do Z-API
 app.post('/webhook', webhook);
 
-// Configuração da porta - Railway fornece a variável PORT
 const PORT = process.env.PORT || 3000;
-
-// Removendo o HOST fixo para permitir que o Railway gerencie
-app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando na porta ${PORT}`);
+const HOST = '0.0.0.0';
+app.listen(PORT, HOST, () => {
+  console.log(`✅ Servidor rodando em http://${HOST}:${PORT}`);
 });
