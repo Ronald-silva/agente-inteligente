@@ -1,47 +1,50 @@
-// server.js
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
-const webhook = require('./controllers/webhook');
-
-// Carrega variáveis de ambiente
-dotenv.config();
+const processMessage = require('./services/messageProcessor');
 
 // Inicializa o Express
 const app = express();
-
-// Middleware
 app.use(express.json());
-app.use(express.static('public'));
 
-// Health check
-app.get('/health', (_, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+// Logs de requisição
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    console.log(`${req.method} ${req.path} - ${Date.now() - start}ms`);
+  });
+  next();
 });
 
-// Webhook
-app.post('/webhook', webhook);
+// Rota de status para healthcheck
+app.get('/status', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
-// Error handling
+// Rota do webhook do WhatsApp
+app.post('/webhook', async (req, res) => {
+  try {
+    console.log('📱 Mensagem recebida:', req.body);
+    res.sendStatus(200); // Responde rapidamente ao webhook
+    
+    // Processa a mensagem de forma assíncrona
+    const message = req.body;
+    if (message && message.phone && message.message) {
+      await processMessage(message);
+    }
+  } catch (error) {
+    console.error('❌ Erro no webhook:', error);
+    // Não enviamos o erro para o cliente pois já respondemos
+  }
+});
+
+// Tratamento de erros
 app.use((err, req, res, next) => {
-  console.error('❌ Erro:', err);
+  console.error('❌ Erro na aplicação:', err);
   res.status(500).json({ error: 'Erro interno no servidor' });
 });
 
-// Inicialização
+// Inicialização do servidor
 const PORT = process.env.PORT || 3000;
-
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log('✅ Servidor iniciado na porta:', PORT);
-  console.log('📝 Variáveis de ambiente:');
-  console.log('- PORT:', PORT);
-  console.log('- NODE_ENV:', process.env.NODE_ENV || 'development');
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('🛑 Recebido sinal SIGTERM');
-  server.close(() => {
-    console.log('✅ Servidor encerrado');
-    process.exit(0);
-  });
-});
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+}); 

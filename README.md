@@ -1,32 +1,42 @@
-# 🤖 Carla - Atendimento Inteligente do Colégio Lucê
+# API Express Básica
 
-Um agente de atendimento automatizado via WhatsApp, alimentado por inteligência artificial (ChatGPT) e preparado para responder às dúvidas mais comuns de pais e responsáveis escolares. Ideal para escolas, clínicas, deliverys e outros negócios que recebem muitas perguntas repetitivas.
+## Configuração
 
----
+1. Clone o repositório
+2. Instale as dependências:
+```bash
+npm install
+```
 
-## 🚀 Funcionalidades
+3. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+```
+PORT=3000
+NODE_ENV=development
 
-- Atendimento 100% automatizado via WhatsApp (Z-API)
-- Integração com OpenAI (ChatGPT)
-- Suporte a múltiplos atendimentos simultâneos
-- Respostas com base no conteúdo institucional da escola
-- Estrutura reutilizável para qualquer tipo de negócio
+# OpenAI API
+OPENAI_API_KEY=sua_chave_da_openai
 
----
+# Z-API (WhatsApp)
+ZAPI_INSTANCE_ID=seu_instance_id
+ZAPI_TOKEN=seu_token
+```
 
-## 🛠 Tecnologias Utilizadas
+4. Inicie o servidor:
+```bash
+npm start
+```
+
+## Rotas Disponíveis
+
+- `GET /status` - Verificação de saúde do servidor
+  - Resposta: `{"status": "ok"}`
+- `POST /webhook` - Endpoint para receber mensagens
+  - Corpo da requisição: `{ "phone": "5511999999999", "message": "sua mensagem" }`
+
+## Tecnologias Utilizadas
 
 - Node.js
-- Express.js
+- Express
 - OpenAI API
-- Z-API (integração com WhatsApp)
-- Railway (deploy gratuito e prático)
-
----
-
-## 🧪 Instalação Local
-
-```bash
-git clone https://github.com/seu-usuario/agente-inteligente-whatsapp.git
-cd agente-inteligente-whatsapp
-npm install
+- Z-API (WhatsApp)
+- dotenv 
