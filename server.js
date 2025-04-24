@@ -9,6 +9,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
+// Health check para o Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Servir dashboard.html na raiz
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboard.html'));
@@ -17,9 +22,10 @@ app.get('/', (req, res) => {
 // Rota do webhook
 app.post('/webhook', webhook);
 
+// Configuração da porta - Railway fornece a variável PORT
 const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
 
-app.listen(PORT, HOST, () =>
-  console.log(`✅ Servidor rodando em http://${HOST}:${PORT}`)
-);
+// Removendo o HOST fixo para permitir que o Railway gerencie
+app.listen(PORT, () => {
+  console.log(`✅ Servidor rodando na porta ${PORT}`);
+});
