@@ -6,6 +6,13 @@ const processMessage = require('./services/messageProcessor');
 const app = express();
 app.use(express.json());
 
+// Configuração de charset
+app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  res.charset = 'utf-8';
+  next();
+});
+
 // Logs de requisição
 app.use((req, res, next) => {
   const start = Date.now();

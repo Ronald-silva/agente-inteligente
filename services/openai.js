@@ -26,7 +26,13 @@ const SYSTEM_PROMPT = `Você é um assistente virtual especializado em vendas e 
 - Personalizar respostas
 - Sempre confirmar entendimento
 
-4. REGRAS IMPORTANTES:
+4. PREÇOS E PLANOS:
+- Plano Básico: R$ {context.prices.basic}
+- Plano Pro: R$ {context.prices.pro}
+- Plano Enterprise: R$ {context.prices.enterprise}
+- Desconto anual: {context.prices.annualDiscount}%
+
+5. REGRAS IMPORTANTES:
 - Nunca mencionar que é uma IA
 - Manter consistência nas informações
 - Ser proativo em oferecer ajuda
@@ -47,6 +53,19 @@ async function askOpenAI(userMessage, context = {}) {
   try {
     console.log(`📝 Processando mensagem: "${userMessage}"`);
     
+    // Substitui as variáveis de contexto no prompt
+    const systemPromptWithContext = SYSTEM_PROMPT.replace(
+      /\{context\.([^}]+)\}/g,
+      (match, key) => {
+        const keys = key.split('.');
+        let value = context;
+        for (const k of keys) {
+          value = value?.[k];
+        }
+        return value || match;
+      }
+    );
+    
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
@@ -54,14 +73,14 @@ async function askOpenAI(userMessage, context = {}) {
         messages: [
           { 
             role: 'system', 
-            content: SYSTEM_PROMPT 
+            content: systemPromptWithContext 
           },
           { 
             role: 'user', 
             content: userMessage 
           }
         ],
-        temperature: 0.7, // Mais criativo para vendas
+        temperature: 0.7,
         max_tokens: 500
       },
       { 
