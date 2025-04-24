@@ -34,30 +34,18 @@ app.use((req, res, next) => {
 
 // Rota de status para healthcheck
 app.get('/status', (req, res) => {
-  try {
-    console.log('📝 Requisição de status recebida');
-    res.status(200).json({ 
-      status: 'ok',
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error('❌ Erro na rota de status:', error);
-    res.status(500).json({ error: 'Erro interno no servidor' });
-  }
+  res.status(200).json({ status: 'ok' });
 });
 
 // Rota do webhook do WhatsApp
 app.post('/webhook', async (req, res) => {
   try {
     console.log('📱 Mensagem recebida:', JSON.stringify(req.body));
-    res.sendStatus(200); // Responde rapidamente ao webhook
+    res.sendStatus(200);
     
-    // Processa a mensagem de forma assíncrona
     const message = req.body;
-    if (message && message.phone && message.message) {
-      await processMessage(message).catch(error => {
-        console.error('❌ Erro ao processar mensagem:', error);
-      });
+    if (message?.phone && message?.message) {
+      await processMessage(message).catch(console.error);
     }
   } catch (error) {
     console.error('❌ Erro no webhook:', error);
@@ -75,12 +63,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erro interno no servidor' });
 });
 
-// Verificação de variáveis de ambiente críticas
+// Verificação de variáveis de ambiente
 const requiredEnvVars = ['OPENAI_API_KEY', 'ZAPI_INSTANCE_ID', 'ZAPI_TOKEN'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
-  console.error('❌ Variáveis de ambiente ausentes:', missingEnvVars.join(', '));
+  console.error('❌ Variáveis ausentes:', missingEnvVars.join(', '));
   process.exit(1);
 }
 

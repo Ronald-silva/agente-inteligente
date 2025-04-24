@@ -1,11 +1,12 @@
 [build]
 builder = "NIXPACKS"
+nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
 startCommand = "node server.js"
 healthcheckPath = "/status"
-healthcheckTimeout = 100
-restartPolicyType = "ON_FAILURE"
+healthcheckTimeout = 30
+restartPolicyType = "ALWAYS"
 numReplicas = 1
 sleepApplication = false
 restartPolicyMaxRetries = 10
