@@ -1,6 +1,10 @@
 require('dotenv').config();
+console.log('✅ Variáveis de ambiente carregadas');
+
 const express = require('express');
 const processMessage = require('./services/messageProcessor');
+
+console.log('✅ Módulos carregados');
 
 // Inicializa o Express
 const app = express();
@@ -13,6 +17,8 @@ app.use((req, res, next) => {
   next();
 });
 
+console.log('✅ Express configurado');
+
 // Logs de requisição
 app.use((req, res, next) => {
   const start = Date.now();
@@ -24,6 +30,7 @@ app.use((req, res, next) => {
 
 // Rota de status para healthcheck
 app.get('/status', (req, res) => {
+  console.log('📝 Requisição de status recebida');
   res.status(200).json({ status: 'ok' });
 });
 
@@ -50,8 +57,17 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erro interno no servidor' });
 });
 
+// Verificação de variáveis de ambiente críticas
+const requiredEnvVars = ['OPENAI_API_KEY', 'ZAPI_INSTANCE_ID', 'ZAPI_TOKEN'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('❌ Variáveis de ambiente ausentes:', missingEnvVars.join(', '));
+  process.exit(1);
+}
+
 // Inicialização do servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log(`✅ Servidor rodando na porta ${PORT}`);
 }); 
